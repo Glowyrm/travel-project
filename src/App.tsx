@@ -1,7 +1,7 @@
-import { tripStore } from "./store/tripStore";
+import { TravelStage, tripStore } from "./store/tripStore";
 import "./App.css";
-import { TravelStage } from "./types/TravelStage";
-import { StagesList } from "./components/StagesList";
+import { StageForm } from "./components/StageForm";
+import { TripOverview } from "./components/TripOverview";
 
 const tripValues: TravelStage[] = [
   {
@@ -53,9 +53,10 @@ const App: React.FC = () => {
   return (
     <div className="App">
       <header className="App-header">
-        <p>Travel Wizard</p>
+        <h1>Travel Wizard</h1>
       </header>
-      <StagesList store={myTrip} />
+      <TripOverview trip={myTrip} />
+      <StageForm />
     </div>
   );
 };

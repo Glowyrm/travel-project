@@ -1,31 +1,47 @@
-import {
-  TransportModes,
-  TravelStage,
-  UniqueTravelStage,
-} from "../types/TravelStage";
 import { action, computed, makeObservable, observable } from "mobx";
 
-interface addResult {
-  wasSuccessful: boolean;
-  message: string;
-}
+export const travelMethods = [
+  "Bus",
+  "Car",
+  "Plane",
+  "Train",
+  "Rocket",
+] as const;
+
+export type TravelType = typeof travelMethods[number];
 
 export interface TripStoreType {
   title: string;
   departureCity: string;
   arrivalCity: string;
-  transportList: TransportModes[];
+  transportList: TravelType[];
   totalTravelTime: number;
   stages: UniqueTravelStage[];
   addStage: (stage: TravelStage) => addResult;
   tripDetails: string;
 }
 
+export interface TravelStage {
+  departureCity: string;
+  arrivalCity: string;
+  transportMode: TravelType;
+  travelTime: number;
+}
+
+export interface UniqueTravelStage extends TravelStage {
+  id: string;
+}
+
+interface addResult {
+  wasSuccessful: boolean;
+  message: string;
+}
+
 export class tripStore implements TripStoreType {
   readonly title: string;
   departureCity: string = "";
   arrivalCity: string = "";
-  transportList: TransportModes[] = [];
+  transportList: TravelType[] = [];
   totalTravelTime: number = 0;
   stages: UniqueTravelStage[] = [];
 

@@ -1,0 +1,57 @@
+*,
+*:before,
+*:after {
+  box-sizing: border-box;
+}
+label {
+  text-align: left;
+  font-size: 0.875rem;
+}
+
+input[type="text"] {
+  margin: 0.25rem 0;
+  border: 1px solid #eee;
+  padding: 0.25rem 0.5rem;
+}
+
+input[type="number"] {
+  margin: 0.25rem 0;
+  border: 1px solid #eee;
+  padding: 0.25rem 0.5rem;
+}
+
+select {
+  margin: 0.25rem 0;
+  border: 1px solid #eee;
+  padding: 0.25rem 0.5rem;
+}
+
+.form-item {
+  flex-basis: calc(50% - 1rem);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+form {
+  margin: auto;
+  min-width: 350px;
+  max-width: 400px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  align-content: space-between;
+  gap: 1rem;
+}
+
+button {
+  background-color: #318ce7;
+  color: white;
+  font-weight: bold;
+  font-size: 1rem;
+  padding: 0.5rem 2rem;
+  border: none;
+  border-radius: 0.5rem;
+}
