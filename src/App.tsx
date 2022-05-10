@@ -1,7 +1,7 @@
-import { useState } from "react";
 import { tripStore } from "./store/tripStore";
 import "./App.css";
 import { TravelStage } from "./types/TravelStage";
+import { StagesList } from "./components/StagesList";
 
 const tripValues: TravelStage[] = [
   {
@@ -19,28 +19,43 @@ const tripValues: TravelStage[] = [
   {
     departureCity: "Austin",
     arrivalCity: "San Antonio",
+    travelTime: 3,
+    transportMode: "Car",
+  },
+  {
+    departureCity: "San Antonio",
+    arrivalCity: "Austin",
+    travelTime: 3,
+    transportMode: "Car",
+  },
+  {
+    departureCity: "Austin",
+    arrivalCity: "Dallas",
     travelTime: 4,
+    transportMode: "Car",
+  },
+  {
+    departureCity: "Dallas",
+    arrivalCity: "Houston",
+    travelTime: 6,
     transportMode: "Car",
   },
 ];
 
 const App: React.FC = () => {
-  const [count, setCount] = useState(0);
-
-  const myTrip = new tripStore();
-  tripValues.forEach((currentStage) => myTrip.addStage(currentStage));
-  console.log(myTrip.stagesList);
+  const myTrip = new tripStore("Texas Trip");
+  tripValues.forEach((currentStage) => {
+    let { wasSuccessful, message } = myTrip.addStage(currentStage);
+    if (!wasSuccessful)
+      console.log(`Trip stage was NOT added, because: ${message}`);
+  });
 
   return (
     <div className="App">
       <header className="App-header">
         <p>Travel Wizard</p>
-        <p>
-          <button type="button" onClick={() => setCount((count) => count + 1)}>
-            count is: {count}
-          </button>
-        </p>
       </header>
+      <StagesList store={myTrip} />
     </div>
   );
 };
