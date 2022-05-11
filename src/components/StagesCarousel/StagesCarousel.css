@@ -9,8 +9,14 @@
 }
 
 .carousel-tabs {
+  margin: 0 auto 1rem auto;
   display: flex;
   flex-direction: row;
+  text-align: center;
+}
+
+.carousel-tabs p {
+  margin: 0;
 }
 
 .carousel-controls {

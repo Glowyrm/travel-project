@@ -11,12 +11,12 @@ const TripOverview: React.FC<Props> = ({ trip }) => {
     <div>
       <div>
         <h2>{trip.title}</h2>
-        <p>Starting from {trip.departureCity}</p>
-        <p>Final Destination {trip.arrivalCity}</p>
+        <p>Begin in {trip.departureCity}</p>
+        <p>Finish in {trip.arrivalCity}</p>
         <p>Total ETT {trip.totalTravelTime} hours</p>
       </div>
 
-      <StagesList stages={trip.stages} />
+      <StagesList stages={trip.tripStages} />
     </div>
   );
 };

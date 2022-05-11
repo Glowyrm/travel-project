@@ -1,22 +1,24 @@
 import React, { useEffect, useState } from "react";
 import {
+  AddResult,
   travelMethods,
-  TravelStage,
   TravelType,
   UniqueTravelStage,
 } from "../../store/tripStore";
 import "./StageForm.css";
+import { observer } from "mobx-react";
 
 interface Props {
   stage: UniqueTravelStage;
+  updateStage: (stage: UniqueTravelStage) => void;
 }
 
-const StageForm: React.FC<Props> = ({ stage }) => {
+const StageForm: React.FC<Props> = ({ stage, updateStage }) => {
   const [departureCity, setDepartureCity] = useState<string>(
     stage.departureCity
   );
-  const [arrrivalCity, setArrivalCity] = useState<string>(stage.arrivalCity);
-  const [travelMode, setTravelMode] = useState<TravelType | "">(
+  const [arrivalCity, setArrivalCity] = useState<string>(stage.arrivalCity);
+  const [transportMode, setTransportMode] = useState<TravelType>(
     stage.transportMode
   );
   const [travelTime, setTravelTime] = useState<number>(stage.travelTime);
@@ -25,11 +27,8 @@ const StageForm: React.FC<Props> = ({ stage }) => {
   useEffect(() => {
     setDepartureCity(stage.departureCity);
     setArrivalCity(stage.arrivalCity);
-    setTravelMode(stage.transportMode);
+    setTransportMode(stage.transportMode);
     setTravelTime(stage.travelTime);
-  }, [stage]);
-
-  useEffect(() => {
     setPreventEdit(stage.isSaved);
   }, [stage]);
 
@@ -40,12 +39,14 @@ const StageForm: React.FC<Props> = ({ stage }) => {
   const handleSubmit = (e: React.FormEvent<EventTarget>) => {
     e.preventDefault();
     let result = {
+      ...stage,
       departureCity,
-      arrrivalCity,
-      travelMode,
+      arrivalCity,
+      transportMode,
       travelTime,
     };
-    console.log("You created this route: \n", JSON.stringify(result, null, 3));
+
+    updateStage(result);
   };
 
   return (
@@ -68,7 +69,7 @@ const StageForm: React.FC<Props> = ({ stage }) => {
         <input
           id="city-arrival"
           type="text"
-          value={arrrivalCity}
+          value={arrivalCity}
           onChange={(e) => setArrivalCity(e.target.value)}
           required
           disabled={preventEdit}
@@ -80,8 +81,8 @@ const StageForm: React.FC<Props> = ({ stage }) => {
         <label htmlFor="transportation">Traveling by... ?</label>
         <select
           id="transportation"
-          value={travelMode}
-          onChange={(e) => setTravelMode(e.target.value as TravelType)}
+          value={transportMode}
+          onChange={(e) => setTransportMode(e.target.value as TravelType)}
           required
           disabled={preventEdit}
           name="transportation"
@@ -90,13 +91,15 @@ const StageForm: React.FC<Props> = ({ stage }) => {
             Choose Transport
           </option>
           {travelMethods.map((t) => (
-            <option value={t}>{t}</option>
+            <option key={t} value={t}>
+              {t}
+            </option>
           ))}
         </select>
       </div>
 
       <div className="form-item">
-        <label htmlFor="travel-time">Est. Travel Time</label>
+        <label htmlFor="travel-time">Est. Travel Time (Hours)</label>
         <input
           id="travel-time"
           type="number"
@@ -110,12 +113,17 @@ const StageForm: React.FC<Props> = ({ stage }) => {
       </div>
 
       <div className="button-group">
-        <button className="form-submit" type="button" onClick={AllowEdit}>
-          Edit Stage
+        <button
+          className="form-submit"
+          type="button"
+          onClick={AllowEdit}
+          disabled={!preventEdit}
+        >
+          Edit
         </button>
 
         <button className="form-submit" type="submit" disabled={preventEdit}>
-          Add Stage
+          {stage.isSaved ? "Update" : "Add"}
         </button>
       </div>
     </form>

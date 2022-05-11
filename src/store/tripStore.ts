@@ -16,9 +16,9 @@ export interface TripStoreType {
   arrivalCity: string;
   transportList: TravelType[];
   totalTravelTime: number;
-  stages: UniqueTravelStage[];
+  tripStages: UniqueTravelStage[];
   totalStages: number;
-  addStage: (stage: TravelStage) => addResult;
+  addStage: (stage: UniqueTravelStage) => AddResult;
   tripDetails: string;
 }
 
@@ -34,56 +34,77 @@ export interface UniqueTravelStage extends TravelStage {
   isSaved: boolean;
 }
 
-interface addResult {
+export interface AddResult {
   wasSuccessful: boolean;
   message: string;
 }
 
-export class tripStore implements TripStoreType {
+interface FindIndex {
+  found: boolean;
+  index: number | undefined;
+}
+
+class tripStore implements TripStoreType {
   readonly title: string;
-  departureCity: string = "";
-  arrivalCity: string = "";
-  transportList: TravelType[] = [];
-  totalTravelTime: number = 0;
-  stages: UniqueTravelStage[] = [];
+
+  private stages: UniqueTravelStage[] = [];
 
   constructor(title: string) {
     this.title = title;
+
     makeObservable(this, {
       title: observable,
-      departureCity: observable,
-      arrivalCity: observable,
-      transportList: observable,
-      totalTravelTime: observable,
-      stages: observable,
+      tripStages: computed,
       totalStages: computed,
-      addStage: action,
+      arrivalCity: computed,
+      departureCity: computed,
+      totalTravelTime: computed,
+      transportList: computed,
       tripDetails: computed,
+      addStage: action.bound,
     });
   }
 
-  get totalStages() {
+  get tripStages(): UniqueTravelStage[] {
+    return this.stages;
+  }
+
+  get totalStages(): number {
     return this.stages.length;
   }
 
-  addStage(stage: TravelStage): addResult {
-    if (this.stages.length < 5) {
-      // use date for unique ID since it will be unique enough for local user session
-      const id = `${new Date().valueOf()}-${Math.random()}`;
-      const newStage: UniqueTravelStage = { ...stage, id, isSaved: true };
-      this.stages.push(newStage);
-      if (this.departureCity === "") this.departureCity = stage.departureCity;
-      this.arrivalCity = stage.arrivalCity;
-      this.transportList.push(stage.transportMode);
-      this.totalTravelTime += stage.travelTime;
-      // return a result message since this operation may fail
-      return <addResult>{ wasSuccessful: true, message: id.toString() };
-    }
-    // return a result message explaining reason for failure
-    return <addResult>{
-      wasSuccessful: false,
-      message: "Total Stages would Exceed max of 5",
-    };
+  get hasStages(): boolean {
+    return this.totalStages > 0;
+  }
+
+  get isStagesEmpty(): boolean {
+    return this.totalStages === 0;
+  }
+
+  get arrivalCity(): string {
+    if (this.isStagesEmpty) return "";
+    let lastStage = this.totalStages - 1;
+    return this.stages[lastStage].arrivalCity;
+  }
+
+  get departureCity(): string {
+    if (this.isStagesEmpty) return "";
+    return this.stages[0].departureCity;
+  }
+
+  get totalTravelTime(): number {
+    if (this.isStagesEmpty) return 0;
+    let result: number = this.stages.reduce(
+      (total, { travelTime }) => total + travelTime,
+      0
+    );
+    return result;
+  }
+
+  get transportList(): TravelType[] {
+    if (this.isStagesEmpty) return [];
+    let result: TravelType[] = this.stages.map((s) => s.transportMode);
+    return result;
   }
 
   get tripDetails(): string {
@@ -95,4 +116,121 @@ export class tripStore implements TripStoreType {
     };
     return JSON.stringify(result, null, 4);
   }
+
+  findStageIndex(id: string): FindIndex {
+    if (this.isStagesEmpty) return { found: false, index: undefined };
+    let targetIndex;
+
+    for (let i = 0; i < this.stages.length; i++) {
+      if (this.stages[i].id === id) {
+        targetIndex = i;
+        break;
+      }
+    }
+
+    let result: FindIndex =
+      typeof targetIndex == undefined
+        ? { found: false, index: undefined }
+        : { found: true, index: targetIndex };
+
+    return result;
+  }
+
+  private updateStage(stage: UniqueTravelStage): AddResult {
+    let indexObj = this.findStageIndex(stage.id);
+
+    if (indexObj.found === true) {
+      const newstageArr = this.stages.map((s, i) => {
+        if (i === indexObj.index) return stage;
+        return s;
+      });
+      this.stages = newstageArr;
+      return <AddResult>{ wasSuccessful: true, message: stage.id };
+    }
+
+    return <AddResult>{
+      wasSuccessful: false,
+      message: "Stage with Matching ID not found",
+    };
+  }
+
+  private addNewStage(stage: UniqueTravelStage): AddResult {
+    let targetIndex = parseInt(stage.id, 10);
+
+    if (targetIndex < 0 || targetIndex > 5)
+      return <AddResult>{
+        wasSuccessful: false,
+        message: "Not able to add at target index (must be between 0 and 5)",
+      };
+
+    // use date + Match.random for unique ID since it will be unique enough for local user session
+    const id = `${new Date().valueOf()}-${Math.random()}`;
+
+    const newStage: UniqueTravelStage = { ...stage, id, isSaved: true };
+    this.stages.splice(targetIndex, 0, newStage);
+
+    // return a result message since this operation may fail
+    return <AddResult>{ wasSuccessful: true, message: id.toString() };
+  }
+
+  addStage(stage: UniqueTravelStage): AddResult {
+    if (this.totalStages > 5) {
+      // return a result message explaining reason for failure
+      return <AddResult>{
+        wasSuccessful: false,
+        message: "Total Stages would Exceed max of 5",
+      };
+    }
+
+    if (stage.isSaved) {
+      return this.updateStage(stage);
+    }
+
+    return this.addNewStage(stage);
+  }
 }
+
+const tripValues: UniqueTravelStage[] = [
+  {
+    departureCity: "Houston",
+    arrivalCity: "Dallas",
+    travelTime: 6,
+    transportMode: "Car",
+    isSaved: false,
+    id: "0",
+  },
+  {
+    departureCity: "Dallas",
+    arrivalCity: "Austin",
+    travelTime: 4,
+    transportMode: "Car",
+    isSaved: false,
+    id: "1",
+  },
+  {
+    departureCity: "Austin",
+    arrivalCity: "San Antonio",
+    travelTime: 3,
+    transportMode: "Car",
+    isSaved: false,
+    id: "3",
+  },
+  {
+    departureCity: "San Antonio",
+    arrivalCity: "Houston",
+    travelTime: 4,
+    transportMode: "Car",
+    isSaved: false,
+    id: "2",
+  },
+];
+
+const myTrip = new tripStore("Texas Trip");
+
+tripValues.forEach((s) => {
+  let { wasSuccessful, message } = myTrip.addStage(s);
+  if (!wasSuccessful)
+    console.log(`Trip stage was NOT added, because: ${message}`);
+});
+
+export default myTrip;
