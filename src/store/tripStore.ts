@@ -8,7 +8,7 @@ export const travelMethods = [
   "Rocket",
 ] as const;
 
-export type TravelType = typeof travelMethods[number];
+export type TravelType = typeof travelMethods[number] | "notSelected";
 
 export interface TripStoreType {
   title: string;
@@ -17,6 +17,7 @@ export interface TripStoreType {
   transportList: TravelType[];
   totalTravelTime: number;
   stages: UniqueTravelStage[];
+  totalStages: number;
   addStage: (stage: TravelStage) => addResult;
   tripDetails: string;
 }
@@ -30,6 +31,7 @@ export interface TravelStage {
 
 export interface UniqueTravelStage extends TravelStage {
   id: string;
+  isSaved: boolean;
 }
 
 interface addResult {
@@ -54,16 +56,21 @@ export class tripStore implements TripStoreType {
       transportList: observable,
       totalTravelTime: observable,
       stages: observable,
+      totalStages: computed,
       addStage: action,
       tripDetails: computed,
     });
+  }
+
+  get totalStages() {
+    return this.stages.length;
   }
 
   addStage(stage: TravelStage): addResult {
     if (this.stages.length < 5) {
       // use date for unique ID since it will be unique enough for local user session
       const id = `${new Date().valueOf()}-${Math.random()}`;
-      const newStage: UniqueTravelStage = { ...stage, id };
+      const newStage: UniqueTravelStage = { ...stage, id, isSaved: true };
       this.stages.push(newStage);
       if (this.departureCity === "") this.departureCity = stage.departureCity;
       this.arrivalCity = stage.arrivalCity;

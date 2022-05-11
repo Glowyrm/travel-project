@@ -1,7 +1,8 @@
 import { TravelStage, tripStore } from "./store/tripStore";
 import "./App.css";
-import { StageForm } from "./components/StageForm";
 import { TripOverview } from "./components/TripOverview";
+import { StagesCarousel } from "./components/StagesCarousel";
+import { useState } from "react";
 
 const tripValues: TravelStage[] = [
   {
@@ -42,21 +43,37 @@ const tripValues: TravelStage[] = [
   },
 ];
 
+const myTrip = new tripStore("Texas Trip");
+tripValues.forEach((s) => {
+  let { wasSuccessful, message } = myTrip.addStage(s);
+  if (!wasSuccessful)
+    console.log(`Trip stage was NOT added, because: ${message}`);
+});
+
 const App: React.FC = () => {
-  const myTrip = new tripStore("Texas Trip");
-  tripValues.forEach((currentStage) => {
-    let { wasSuccessful, message } = myTrip.addStage(currentStage);
-    if (!wasSuccessful)
-      console.log(`Trip stage was NOT added, because: ${message}`);
-  });
+  const [index, setIndex] = useState<number>(0);
+
+  const changeIndex = (value: number): void => {
+    let potentialIndex = index + value;
+    console.log("Button Pressed, Potential index: ", potentialIndex);
+    if (potentialIndex >= 0 && potentialIndex <= myTrip.totalStages - 1) {
+      console.log("index Changed");
+      setIndex(potentialIndex);
+    }
+  };
 
   return (
     <div className="App">
       <header className="App-header">
         <h1>Travel Wizard</h1>
       </header>
+
       <TripOverview trip={myTrip} />
-      <StageForm />
+      <StagesCarousel
+        stages={myTrip.stages}
+        index={index}
+        changeIndex={changeIndex}
+      />
     </div>
   );
 };

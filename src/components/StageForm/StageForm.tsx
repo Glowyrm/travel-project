@@ -1,12 +1,41 @@
-import React, { useState } from "react";
-import { travelMethods, TravelType } from "../../store/tripStore";
+import React, { useEffect, useState } from "react";
+import {
+  travelMethods,
+  TravelStage,
+  TravelType,
+  UniqueTravelStage,
+} from "../../store/tripStore";
 import "./StageForm.css";
 
-const StageForm = () => {
-  const [departureCity, setDepartureCity] = useState<string>("");
-  const [arrrivalCity, setArrivalCity] = useState<string>("");
-  const [travelMode, setTravelMode] = useState<TravelType | "">("");
-  const [travelTime, setTravelTime] = useState<number>(0);
+interface Props {
+  stage: UniqueTravelStage;
+}
+
+const StageForm: React.FC<Props> = ({ stage }) => {
+  const [departureCity, setDepartureCity] = useState<string>(
+    stage.departureCity
+  );
+  const [arrrivalCity, setArrivalCity] = useState<string>(stage.arrivalCity);
+  const [travelMode, setTravelMode] = useState<TravelType | "">(
+    stage.transportMode
+  );
+  const [travelTime, setTravelTime] = useState<number>(stage.travelTime);
+  const [preventEdit, setPreventEdit] = useState<boolean>(stage.isSaved);
+
+  useEffect(() => {
+    setDepartureCity(stage.departureCity);
+    setArrivalCity(stage.arrivalCity);
+    setTravelMode(stage.transportMode);
+    setTravelTime(stage.travelTime);
+  }, [stage]);
+
+  useEffect(() => {
+    setPreventEdit(stage.isSaved);
+  }, [stage]);
+
+  const AllowEdit = () => {
+    setPreventEdit(false);
+  };
 
   const handleSubmit = (e: React.FormEvent<EventTarget>) => {
     e.preventDefault();
@@ -29,6 +58,7 @@ const StageForm = () => {
           value={departureCity}
           onChange={(e) => setDepartureCity(e.target.value)}
           required
+          disabled={preventEdit}
           placeholder="Traveling from..."
         />
       </div>
@@ -41,19 +71,24 @@ const StageForm = () => {
           value={arrrivalCity}
           onChange={(e) => setArrivalCity(e.target.value)}
           required
+          disabled={preventEdit}
           placeholder="Traveling to..."
         />
       </div>
 
       <div className="form-item">
-        <label htmlFor="cars">Traveling by... ?</label>
+        <label htmlFor="transportation">Traveling by... ?</label>
         <select
-          id="cars"
+          id="transportation"
           value={travelMode}
           onChange={(e) => setTravelMode(e.target.value as TravelType)}
           required
-          name="cars"
+          disabled={preventEdit}
+          name="transportation"
         >
+          <option value="notSelected" disabled>
+            Choose Transport
+          </option>
           {travelMethods.map((t) => (
             <option value={t}>{t}</option>
           ))}
@@ -68,12 +103,21 @@ const StageForm = () => {
           value={travelTime}
           onChange={(e) => setTravelTime(parseInt(e.target.value, 10))}
           required
+          disabled={preventEdit}
           min={1}
           max={26280}
         />
       </div>
 
-      <button type="submit">Add Route</button>
+      <div className="button-group">
+        <button className="form-submit" type="button" onClick={AllowEdit}>
+          Edit Stage
+        </button>
+
+        <button className="form-submit" type="submit" disabled={preventEdit}>
+          Add Stage
+        </button>
+      </div>
     </form>
   );
 };
