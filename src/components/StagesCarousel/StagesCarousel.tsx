@@ -50,7 +50,10 @@ const StagesCarousel: React.FC<Props> = ({ index, changeIndex }) => {
   return (
     <div className="carousel-container">
       <div className="carousel-tabs">
-        <p>{`Stage ${index + 1} of ${myTrip.totalStages}`}</p>
+        {currentStage.isSaved && (
+          <p>{`Stage ${index + 1} of ${myTrip.totalStages}`}</p>
+        )}
+        {!currentStage.isSaved && <p>{`New Stage at position ${index + 1}`}</p>}
       </div>
 
       <div>

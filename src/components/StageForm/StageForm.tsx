@@ -139,7 +139,7 @@ const StageForm: React.FC<Props> = ({ stage, updateStage, removeStage }) => {
           className="form-submit"
           type="button"
           onClick={handleDelete}
-          disabled={preventEdit}
+          disabled={preventEdit || !stage.isSaved}
         >
           Delete
         </button>
