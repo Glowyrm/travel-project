@@ -1,3 +1,4 @@
+import { observer } from "mobx-react";
 import React from "react";
 import myTrip from "../../store/tripStore";
 import { StagesList } from "../StagesList";
@@ -7,9 +8,10 @@ const TripOverview: React.FC = () => {
     <div>
       <div>
         <h2>{myTrip.title}</h2>
-        <p>Begin in {myTrip.departureCity}</p>
-        <p>Finish in {myTrip.arrivalCity}</p>
-        <p>Total ETT {myTrip.totalTravelTime} hours</p>
+        <p>
+          From {myTrip.departureCity} to {myTrip.arrivalCity} in{" "}
+          {myTrip.totalTravelTime} hours
+        </p>
       </div>
 
       <StagesList />
@@ -17,4 +19,6 @@ const TripOverview: React.FC = () => {
   );
 };
 
-export default TripOverview;
+const TripOverviewObserver = observer(TripOverview);
+
+export default TripOverviewObserver;

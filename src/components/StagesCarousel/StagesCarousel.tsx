@@ -4,6 +4,7 @@ import {
   faPlus,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { observer } from "mobx-react";
 import { useEffect, useState } from "react";
 import myTrip, { UniqueTravelStage } from "../../store/tripStore";
 import { StageForm } from "../StageForm";
@@ -101,4 +102,6 @@ const StagesCarousel: React.FC<Props> = ({ index, changeIndex }) => {
   );
 };
 
-export default StagesCarousel;
+const StagesCarouselObserver = observer(StagesCarousel);
+
+export default StagesCarouselObserver;

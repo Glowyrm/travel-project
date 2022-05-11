@@ -1,3 +1,4 @@
+import { observer } from "mobx-react";
 import React, { useEffect, useState } from "react";
 import {
   AddResult,
@@ -129,4 +130,6 @@ const StageForm: React.FC<Props> = ({ stage, updateStage }) => {
   );
 };
 
-export default StageForm;
+const StageFormObserver = observer(StageForm);
+
+export default StageFormObserver;

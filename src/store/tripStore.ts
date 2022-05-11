@@ -44,17 +44,17 @@ interface FindIndex {
   index: number | undefined;
 }
 
-class tripStore implements TripStoreType {
+class TripStore implements TripStoreType {
   readonly title: string;
 
-  private stages: UniqueTravelStage[] = [];
+  tripStages: UniqueTravelStage[] = [];
 
   constructor(title: string) {
     this.title = title;
 
     makeObservable(this, {
       title: observable,
-      tripStages: computed,
+      tripStages: observable,
       totalStages: computed,
       arrivalCity: computed,
       departureCity: computed,
@@ -65,12 +65,8 @@ class tripStore implements TripStoreType {
     });
   }
 
-  get tripStages(): UniqueTravelStage[] {
-    return this.stages;
-  }
-
   get totalStages(): number {
-    return this.stages.length;
+    return this.tripStages.length;
   }
 
   get hasStages(): boolean {
@@ -84,17 +80,17 @@ class tripStore implements TripStoreType {
   get arrivalCity(): string {
     if (this.isStagesEmpty) return "";
     let lastStage = this.totalStages - 1;
-    return this.stages[lastStage].arrivalCity;
+    return this.tripStages[lastStage].arrivalCity;
   }
 
   get departureCity(): string {
     if (this.isStagesEmpty) return "";
-    return this.stages[0].departureCity;
+    return this.tripStages[0].departureCity;
   }
 
   get totalTravelTime(): number {
     if (this.isStagesEmpty) return 0;
-    let result: number = this.stages.reduce(
+    let result: number = this.tripStages.reduce(
       (total, { travelTime }) => total + travelTime,
       0
     );
@@ -103,7 +99,7 @@ class tripStore implements TripStoreType {
 
   get transportList(): TravelType[] {
     if (this.isStagesEmpty) return [];
-    let result: TravelType[] = this.stages.map((s) => s.transportMode);
+    let result: TravelType[] = this.tripStages.map((s) => s.transportMode);
     return result;
   }
 
@@ -112,7 +108,7 @@ class tripStore implements TripStoreType {
       depart: this.departureCity,
       arrive: this.arrivalCity,
       totalTime: this.totalTravelTime,
-      stages: this.stages,
+      stages: this.tripStages,
     };
     return JSON.stringify(result, null, 4);
   }
@@ -121,8 +117,8 @@ class tripStore implements TripStoreType {
     if (this.isStagesEmpty) return { found: false, index: undefined };
     let targetIndex;
 
-    for (let i = 0; i < this.stages.length; i++) {
-      if (this.stages[i].id === id) {
+    for (let i = 0; i < this.tripStages.length; i++) {
+      if (this.tripStages[i].id === id) {
         targetIndex = i;
         break;
       }
@@ -140,11 +136,11 @@ class tripStore implements TripStoreType {
     let indexObj = this.findStageIndex(stage.id);
 
     if (indexObj.found === true) {
-      const newstageArr = this.stages.map((s, i) => {
+      const newstageArr = this.tripStages.map((s, i) => {
         if (i === indexObj.index) return stage;
         return s;
       });
-      this.stages = newstageArr;
+      this.tripStages = newstageArr;
       return <AddResult>{ wasSuccessful: true, message: stage.id };
     }
 
@@ -167,7 +163,7 @@ class tripStore implements TripStoreType {
     const id = `${new Date().valueOf()}-${Math.random()}`;
 
     const newStage: UniqueTravelStage = { ...stage, id, isSaved: true };
-    this.stages.splice(targetIndex, 0, newStage);
+    this.tripStages.splice(targetIndex, 0, newStage);
 
     // return a result message since this operation may fail
     return <AddResult>{ wasSuccessful: true, message: id.toString() };
@@ -225,7 +221,7 @@ const tripValues: UniqueTravelStage[] = [
   },
 ];
 
-const myTrip = new tripStore("Texas Trip");
+const myTrip: TripStoreType = new TripStore("Texas Trip");
 
 tripValues.forEach((s) => {
   let { wasSuccessful, message } = myTrip.addStage(s);
