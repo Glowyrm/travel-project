@@ -1,14 +1,10 @@
 import React from "react";
-import { UniqueTravelStage } from "../../store/tripStore";
+import myTrip from "../../store/tripStore";
 
-interface Props {
-  stages: UniqueTravelStage[];
-}
-
-const StagesList: React.FC<Props> = ({ stages }) => {
+const StagesList: React.FC = () => {
   return (
     <ul>
-      {stages.map((stage) => (
+      {myTrip.tripStages.map((stage) => (
         <li
           key={stage.id}
         >{`${stage.departureCity} to ${stage.arrivalCity} by ${stage.transportMode} in ${stage.travelTime} hours`}</li>

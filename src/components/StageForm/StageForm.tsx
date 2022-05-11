@@ -6,7 +6,6 @@ import {
   UniqueTravelStage,
 } from "../../store/tripStore";
 import "./StageForm.css";
-import { observer } from "mobx-react";
 
 interface Props {
   stage: UniqueTravelStage;

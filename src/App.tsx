@@ -20,8 +20,8 @@ const App: React.FC = () => {
         <h1>Travel Wizard</h1>
       </header>
 
-      <TripOverview trip={myTrip} />
-      <StagesCarousel trip={myTrip} index={index} changeIndex={changeIndex} />
+      <TripOverview />
+      <StagesCarousel index={index} changeIndex={changeIndex} />
     </div>
   );
 };

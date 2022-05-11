@@ -1,22 +1,18 @@
 import React from "react";
-import { TripStoreType } from "../../store/tripStore";
+import myTrip from "../../store/tripStore";
 import { StagesList } from "../StagesList";
 
-interface Props {
-  trip: TripStoreType;
-}
-
-const TripOverview: React.FC<Props> = ({ trip }) => {
+const TripOverview: React.FC = () => {
   return (
     <div>
       <div>
-        <h2>{trip.title}</h2>
-        <p>Begin in {trip.departureCity}</p>
-        <p>Finish in {trip.arrivalCity}</p>
-        <p>Total ETT {trip.totalTravelTime} hours</p>
+        <h2>{myTrip.title}</h2>
+        <p>Begin in {myTrip.departureCity}</p>
+        <p>Finish in {myTrip.arrivalCity}</p>
+        <p>Total ETT {myTrip.totalTravelTime} hours</p>
       </div>
 
-      <StagesList stages={trip.tripStages} />
+      <StagesList />
     </div>
   );
 };

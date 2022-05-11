@@ -5,12 +5,11 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState } from "react";
-import { TripStoreType, UniqueTravelStage } from "../../store/tripStore";
+import myTrip, { UniqueTravelStage } from "../../store/tripStore";
 import { StageForm } from "../StageForm";
 import "./StagesCarousel.css";
 
 interface Props {
-  trip: TripStoreType;
   index: number;
   changeIndex: (value: number) => void;
 }
@@ -24,26 +23,21 @@ const defaultStage: UniqueTravelStage = {
   id: "0",
 };
 
-const StagesCarousel: React.FC<Props> = ({ trip, index, changeIndex }) => {
-  let stages = trip.tripStages;
+const StagesCarousel: React.FC<Props> = ({ index, changeIndex }) => {
   const [currentStage, setCurrentStage] = useState<UniqueTravelStage>(
-    stages[0]
+    myTrip.tripStages[0]
   );
 
   useEffect(() => {
-    setCurrentStage(stages[index]);
+    setCurrentStage(myTrip.tripStages[index]);
   }, [index]);
 
   const updateStage = (stage: UniqueTravelStage) => {
-    let result = trip.addStage(stage);
-
-    console.log(
-      result.wasSuccessful
-        ? `This route has been added`
-        : `This route was not added because: ${result.message}`
-    );
-
-    setCurrentStage(stages[index]);
+    let result = myTrip.addStage(stage);
+    if (!result.wasSuccessful) {
+      console.log("Unable to add stage, because: ", result.message);
+    }
+    setCurrentStage(myTrip.tripStages[index]);
   };
 
   const setNewStage = (indexDelta: number): void => {
@@ -55,7 +49,7 @@ const StagesCarousel: React.FC<Props> = ({ trip, index, changeIndex }) => {
   return (
     <div className="carousel-container">
       <div className="carousel-tabs">
-        <p>{`Stage ${index + 1} of ${stages.length}`}</p>
+        <p>{`Stage ${index + 1} of ${myTrip.totalStages}`}</p>
       </div>
 
       <div>
@@ -77,7 +71,7 @@ const StagesCarousel: React.FC<Props> = ({ trip, index, changeIndex }) => {
           type="button"
           className="carousel-button"
           onClick={() => setNewStage(0)}
-          disabled={!currentStage.isSaved || stages.length >= 5}
+          disabled={!currentStage.isSaved || myTrip.totalStages >= 5}
         >
           <FontAwesomeIcon icon={faPlus} />
           <span>Add Before</span>
@@ -87,7 +81,7 @@ const StagesCarousel: React.FC<Props> = ({ trip, index, changeIndex }) => {
           type="button"
           className="carousel-button"
           onClick={() => setNewStage(1)}
-          disabled={!currentStage.isSaved || stages.length >= 5}
+          disabled={!currentStage.isSaved || myTrip.totalStages >= 5}
         >
           <span>Add After</span>
           <FontAwesomeIcon icon={faPlus} />
@@ -97,7 +91,7 @@ const StagesCarousel: React.FC<Props> = ({ trip, index, changeIndex }) => {
           type="button"
           className="carousel-button"
           onClick={() => changeIndex(1)}
-          disabled={index === stages.length - 1}
+          disabled={index === myTrip.totalStages - 1}
         >
           <span>Next</span>
           <FontAwesomeIcon icon={faChevronRight} />
