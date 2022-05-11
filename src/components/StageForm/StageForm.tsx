@@ -1,7 +1,7 @@
 import { observer } from "mobx-react";
 import React, { useEffect, useState } from "react";
 import {
-  AddResult,
+  changeResult,
   travelMethods,
   TravelType,
   UniqueTravelStage,
@@ -11,9 +11,10 @@ import "./StageForm.css";
 interface Props {
   stage: UniqueTravelStage;
   updateStage: (stage: UniqueTravelStage) => void;
+  removeStage: (stage: UniqueTravelStage) => changeResult;
 }
 
-const StageForm: React.FC<Props> = ({ stage, updateStage }) => {
+const StageForm: React.FC<Props> = ({ stage, updateStage, removeStage }) => {
   const [departureCity, setDepartureCity] = useState<string>(
     stage.departureCity
   );
@@ -47,6 +48,18 @@ const StageForm: React.FC<Props> = ({ stage, updateStage }) => {
     };
 
     updateStage(result);
+  };
+
+  const handleDelete = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    if (stage.isSaved) {
+      let result = removeStage(stage);
+      console.log(
+        result.wasSuccessful
+          ? "Stage was removed"
+          : `Stage could not be removed, because: ${result.message}`
+      );
+    }
   };
 
   return (
@@ -120,6 +133,15 @@ const StageForm: React.FC<Props> = ({ stage, updateStage }) => {
           disabled={!preventEdit}
         >
           Edit
+        </button>
+
+        <button
+          className="form-submit"
+          type="button"
+          onClick={handleDelete}
+          disabled={preventEdit}
+        >
+          Delete
         </button>
 
         <button className="form-submit" type="submit" disabled={preventEdit}>

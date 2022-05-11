@@ -18,7 +18,8 @@ export interface TripStoreType {
   totalTravelTime: number;
   tripStages: UniqueTravelStage[];
   totalStages: number;
-  addStage: (stage: UniqueTravelStage) => AddResult;
+  addStage: (stage: UniqueTravelStage) => changeResult;
+  removeStage: (stage: UniqueTravelStage) => changeResult;
   tripDetails: string;
 }
 
@@ -34,7 +35,7 @@ export interface UniqueTravelStage extends TravelStage {
   isSaved: boolean;
 }
 
-export interface AddResult {
+export interface changeResult {
   wasSuccessful: boolean;
   message: string;
 }
@@ -62,6 +63,7 @@ class TripStore implements TripStoreType {
       transportList: computed,
       tripDetails: computed,
       addStage: action.bound,
+      removeStage: action.bound,
     });
   }
 
@@ -116,12 +118,14 @@ class TripStore implements TripStoreType {
   findStageIndex(id: string): FindIndex {
     if (this.isStagesEmpty) return { found: false, index: undefined };
     let targetIndex;
+    let index = 0;
 
-    for (let i = 0; i < this.tripStages.length; i++) {
-      if (this.tripStages[i].id === id) {
-        targetIndex = i;
+    for (const stage of this.tripStages) {
+      if (stage.id === id) {
+        targetIndex = index;
         break;
       }
+      index++;
     }
 
     let result: FindIndex =
@@ -132,29 +136,29 @@ class TripStore implements TripStoreType {
     return result;
   }
 
-  private updateStage(stage: UniqueTravelStage): AddResult {
+  private updateStage(stage: UniqueTravelStage): changeResult {
     let indexObj = this.findStageIndex(stage.id);
 
     if (indexObj.found === true) {
-      const newstageArr = this.tripStages.map((s, i) => {
+      const newStages = this.tripStages.map((s, i) => {
         if (i === indexObj.index) return stage;
         return s;
       });
-      this.tripStages = newstageArr;
-      return <AddResult>{ wasSuccessful: true, message: stage.id };
+      this.tripStages = newStages;
+      return <changeResult>{ wasSuccessful: true, message: stage.id };
     }
 
-    return <AddResult>{
+    return <changeResult>{
       wasSuccessful: false,
       message: "Stage with Matching ID not found",
     };
   }
 
-  private addNewStage(stage: UniqueTravelStage): AddResult {
+  private addNewStage(stage: UniqueTravelStage): changeResult {
     let targetIndex = parseInt(stage.id, 10);
 
     if (targetIndex < 0 || targetIndex > 5)
-      return <AddResult>{
+      return <changeResult>{
         wasSuccessful: false,
         message: "Not able to add at target index (must be between 0 and 5)",
       };
@@ -166,13 +170,13 @@ class TripStore implements TripStoreType {
     this.tripStages.splice(targetIndex, 0, newStage);
 
     // return a result message since this operation may fail
-    return <AddResult>{ wasSuccessful: true, message: id.toString() };
+    return <changeResult>{ wasSuccessful: true, message: id.toString() };
   }
 
-  addStage(stage: UniqueTravelStage): AddResult {
+  addStage(stage: UniqueTravelStage): changeResult {
     if (this.totalStages > 5) {
       // return a result message explaining reason for failure
-      return <AddResult>{
+      return <changeResult>{
         wasSuccessful: false,
         message: "Total Stages would Exceed max of 5",
       };
@@ -184,8 +188,31 @@ class TripStore implements TripStoreType {
 
     return this.addNewStage(stage);
   }
+
+  removeStage(stage: UniqueTravelStage): changeResult {
+    if (!stage.isSaved) {
+      return <changeResult>{
+        wasSuccessful: false,
+        message: "Stage had not been saved yet",
+      };
+    }
+
+    let result = this.findStageIndex(stage.id);
+    if (result.found) {
+      const newStages = this.tripStages.filter((s) => {
+        if (s.id !== stage.id) return s;
+      });
+      this.tripStages = newStages;
+    }
+
+    return <changeResult>{
+      wasSuccessful: false,
+      message: "Matching stage not found",
+    };
+  }
 }
 
+// default values to use for sanity checks
 const tripValues: UniqueTravelStage[] = [
   {
     departureCity: "Houston",
@@ -223,10 +250,10 @@ const tripValues: UniqueTravelStage[] = [
 
 const myTrip: TripStoreType = new TripStore("Texas Trip");
 
-tripValues.forEach((s) => {
-  let { wasSuccessful, message } = myTrip.addStage(s);
-  if (!wasSuccessful)
-    console.log(`Trip stage was NOT added, because: ${message}`);
-});
+// tripValues.forEach((s) => {
+//   let { wasSuccessful, message } = myTrip.addStage(s);
+//   if (!wasSuccessful)
+//     console.log(`Trip stage was NOT added, because: ${message}`);
+// });
 
 export default myTrip;

@@ -1,3 +1,12 @@
+.overview-container {
+  margin-bottom: 2.5rem;
+  border: none;
+}
+
+.overview-heading {
+  margin-top: 0.5rem;
+}
+
 .grid-container {
   display: grid;
 }

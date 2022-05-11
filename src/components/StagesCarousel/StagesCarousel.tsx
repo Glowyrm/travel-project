@@ -26,11 +26,11 @@ const defaultStage: UniqueTravelStage = {
 
 const StagesCarousel: React.FC<Props> = ({ index, changeIndex }) => {
   const [currentStage, setCurrentStage] = useState<UniqueTravelStage>(
-    myTrip.tripStages[0]
+    myTrip.totalStages > 0 ? myTrip.tripStages[0] : defaultStage
   );
 
   useEffect(() => {
-    setCurrentStage(myTrip.tripStages[index]);
+    if (myTrip.totalStages > 0) setCurrentStage(myTrip.tripStages[index]);
   }, [index]);
 
   const updateStage = (stage: UniqueTravelStage) => {
@@ -54,7 +54,11 @@ const StagesCarousel: React.FC<Props> = ({ index, changeIndex }) => {
       </div>
 
       <div>
-        <StageForm stage={currentStage} updateStage={updateStage} />
+        <StageForm
+          stage={currentStage}
+          updateStage={updateStage}
+          removeStage={myTrip.removeStage}
+        />
       </div>
 
       <div className="carousel-controls">
@@ -92,7 +96,9 @@ const StagesCarousel: React.FC<Props> = ({ index, changeIndex }) => {
           type="button"
           className="carousel-button"
           onClick={() => changeIndex(1)}
-          disabled={index === myTrip.totalStages - 1}
+          disabled={
+            index === myTrip.totalStages - 1 || myTrip.totalStages === 0
+          }
         >
           <span>Next</span>
           <FontAwesomeIcon icon={faChevronRight} />
