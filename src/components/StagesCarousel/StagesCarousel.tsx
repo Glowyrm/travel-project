@@ -10,11 +10,6 @@ import myTrip, { UniqueTravelStage } from "../../store/tripStore";
 import { StageForm } from "../StageForm";
 import "./StagesCarousel.css";
 
-interface Props {
-  index: number;
-  changeIndex: (value: number) => void;
-}
-
 const defaultStage: UniqueTravelStage = {
   departureCity: "",
   arrivalCity: "",
@@ -24,43 +19,68 @@ const defaultStage: UniqueTravelStage = {
   id: "0",
 };
 
-const StagesCarousel: React.FC<Props> = ({ index, changeIndex }) => {
+const StagesCarousel: React.FC = () => {
   const [currentStage, setCurrentStage] = useState<UniqueTravelStage>(
     myTrip.totalStages > 0 ? myTrip.tripStages[0] : defaultStage
   );
 
   useEffect(() => {
-    if (myTrip.totalStages > 0) setCurrentStage(myTrip.tripStages[index]);
-  }, [index]);
+    if (myTrip.totalStages > 0) {
+      console.log("setting new stage");
+      setCurrentStage(myTrip.tripStages[myTrip.index]);
+    } else {
+      setCurrentStage(defaultStage);
+      console.log("setting default stage");
+    }
+  }, [myTrip.index]);
 
   const updateStage = (stage: UniqueTravelStage) => {
     let result = myTrip.addStage(stage);
-    if (!result.wasSuccessful) {
-      console.log("Unable to add stage, because: ", result.message);
+    if (result.wasSuccessful) {
+      if (!stage.isSaved) {
+        let newStageIndex = parseInt(stage.id, 10);
+        myTrip.setIndex(newStageIndex);
+        setCurrentStage(myTrip.tripStages[myTrip.index]);
+      }
     }
-    setCurrentStage(myTrip.tripStages[index]);
   };
 
   const setNewStage = (indexDelta: number): void => {
-    let newIndex = index + indexDelta;
+    let newIndex = myTrip.index + indexDelta;
     let newStage = { ...defaultStage, id: newIndex.toString() };
     setCurrentStage(newStage);
+  };
+
+  const removeStage = (stage: UniqueTravelStage): void => {
+    if (stage.isSaved) {
+      let result = myTrip.removeStage(stage);
+      if (result.wasSuccessful) {
+        if (myTrip.lastStageIndex >= 0) {
+          myTrip.setIndex(myTrip.lastStageIndex);
+        } else {
+          myTrip.setIndex(0);
+          setCurrentStage(defaultStage);
+        }
+      }
+    }
   };
 
   return (
     <div className="carousel-container">
       <div className="carousel-tabs">
         {currentStage.isSaved && (
-          <p>{`Stage ${index + 1} of ${myTrip.totalStages}`}</p>
+          <p>{`Stage ${myTrip.index + 1} of ${myTrip.totalStages}`}</p>
         )}
-        {!currentStage.isSaved && <p>{`New Stage at position ${index + 1}`}</p>}
+        {!currentStage.isSaved && (
+          <p>{`New Stage at position ${myTrip.index + 1}`}</p>
+        )}
       </div>
 
       <div>
         <StageForm
           stage={currentStage}
           updateStage={updateStage}
-          removeStage={myTrip.removeStage}
+          removeStage={removeStage}
         />
       </div>
 
@@ -68,8 +88,8 @@ const StagesCarousel: React.FC<Props> = ({ index, changeIndex }) => {
         <button
           type="button"
           className="carousel-button"
-          onClick={(e) => changeIndex(-1)}
-          disabled={index === 0}
+          onClick={myTrip.decrementIndex}
+          disabled={myTrip.index === 0}
         >
           <FontAwesomeIcon icon={faChevronLeft} />
           <span>Prior </span>
@@ -98,10 +118,8 @@ const StagesCarousel: React.FC<Props> = ({ index, changeIndex }) => {
         <button
           type="button"
           className="carousel-button"
-          onClick={() => changeIndex(1)}
-          disabled={
-            index === myTrip.totalStages - 1 || myTrip.totalStages === 0
-          }
+          onClick={myTrip.incrementIndex}
+          disabled={myTrip.index > myTrip.totalStages - 2}
         >
           <span>Next</span>
           <FontAwesomeIcon icon={faChevronRight} />
