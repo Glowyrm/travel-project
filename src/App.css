@@ -1,8 +1,53 @@
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-family: "Roboto Flex", sans-serif;
+  box-sizing: border-box;
+}
+
+body {
+  font-size: 16px;
+}
+
 .App {
-  background-color: #282c34;
   text-align: center;
   min-height: 100vh;
-  color: white;
+  color: black;
+
+  /* background-color: #e7eff9;
+  background-image: url(/clouds.png),
+    linear-gradient(165deg, #e7eff9 0%, #cfd6e6 74%); */
+
+  /* background-color: #aee1f9;
+  background-image: url(/clouds.png),
+    linear-gradient(315deg, #aee1f9 0%, #f6ebe6 74%); */
+
+  background-color: #fde7f9;
+  background-image: url(/clouds.png),
+    linear-gradient(160deg, #fde7f9 0%, #aacaef 44%);
+
+  /* background-color: #5ca0f2;
+  background-image: url(/clouds.png),
+    linear-gradient(330deg, #5ca0f2 0%, #f5f7f6 74%); */
+
+  /* background-color: #ffffff;
+  background-image: url(/clouds.png),
+    linear-gradient(165deg, #ffffff 0%, #5899e2 54%); */
+
+  /* background-color: #fefefe;
+  background-image: url(/clouds.png),
+    linear-gradient(315deg, #fefefe 0%, #00a4e4 74%); */
+
+  /* background-color: #fdf86d;
+  background-image: url(/clouds.png),
+    linear-gradient(165deg, #fdf86d 0%, #bddcf1 37%); */
+
+  /* Hodor's Sentence */
+  /* background-color: #eec0c6;
+  background-image: url(/clouds.png),
+    linear-gradient(165deg, #eec0c6 0%, #7ee8fa 44%); */
+
+  background-size: cover;
 }
 
 .App-header {

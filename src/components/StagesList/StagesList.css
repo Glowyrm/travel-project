@@ -1,15 +1,22 @@
 .stage-card {
   font-weight: bold;
   margin: 0 auto 0.5rem auto;
-  background-color: #dbdbdb;
+  /* background-color: #dbdbdb; */
   color: black;
   border: none;
-  border-radius: 2px;
-  padding: 0.25rem 1rem;
+  /* border-radius: 2px;
+  box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.24) 0px 1px 4px; */
+  padding: 0.5rem 1rem;
   max-width: 400px;
   display: grid;
   grid-template-rows: 1fr 1fr;
   grid-template-columns: 1fr 1fr 1fr;
+}
+
+.stage-cardSelected {
+  border-radius: 0.25rem;
+  /* box-shadow: rgba(17, 21, 26, 0.2) 0px 0.25rem 0.438rem 0px; */
+  background-color: white;
 }
 
 .stage-startCity {

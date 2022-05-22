@@ -6,8 +6,13 @@ import "./StagesList.css";
 const StagesList: React.FC = () => {
   return (
     <>
-      {myTrip.tripStages.map((stage) => (
-        <div className="stage-card" key={stage.id}>
+      {myTrip.tripStages.map((stage, i) => (
+        <div
+          className={`stage-card ${
+            myTrip.index === i ? "stage-cardSelected" : ""
+          }`}
+          key={stage.id}
+        >
           <div className="stage-startCity">{stage.departureCity}</div>
           <div className="stage-endCity">{`To: ${stage.arrivalCity}`}</div>
           <div className="stage-travel">{stage.transportMode}</div>
